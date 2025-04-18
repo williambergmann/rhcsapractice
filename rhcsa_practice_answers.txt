@@ -1,0 +1,913 @@
+Task 1: List files and show date
+
+Command to list files in /var/log in long format:
+ls -l /var/log
+
+Command to display current date and time:
+date
+
+---
+Task 2: Redirection
+
+Command to redirect find output and error streams:
+sudo find /usr -name 'python*' > /tmp/python_files.log 2> /tmp/python_errors.log
+(Note: sudo might be needed to avoid permission errors during find)
+
+Command to append current working directory:
+pwd >> /tmp/python_files.log
+
+---
+Task 3: grep and regex
+
+Command to find "root" lines in /etc/passwd:
+grep '^root:' /etc/passwd > /tmp/root_lines.txt
+(Using '^root:' ensures it matches the username at the start)
+
+Command to find non-commented https service lines in /etc/services:
+grep -i '^\s*https\s*443/tcp' /etc/services > /tmp/https_service.txt
+(Using '^\s*' allows for leading whitespace but excludes '#')
+
+---
+Task 4: SSH Command
+
+Command:
+ssh -p 2222 testuser@server1.lab.example.com
+
+---
+Task 5: su / sudo
+
+Commands for clean root shell:
+su -
+whoami
+exit
+
+Command for running dnf list installed as root:
+sudo dnf list installed
+
+---
+Task 6: Archive Creation and Verification
+
+Command to create the bzip2 compressed archive:
+sudo tar cvjf /opt/etc_configs.tar.bz2 /etc/hosts /etc/resolv.conf /etc/sysconfig/
+
+Command to verify archive contents:
+tar tfj /opt/etc_configs.tar.bz2
+
+---
+Task 7: Create/Edit Files
+
+Command to create an empty file:
+touch /opt/myapp.conf
+
+Commands to create and edit the readme file (using nano):
+nano /opt/readme.txt
+(Type: Application Readme File, Ctrl+O, Enter, Ctrl+X)
+
+Commands to create and edit the readme file (using vim):
+vim /opt/readme.txt
+(Press i, Type: Application Readme File, Press Esc, Type :wq, Press Enter)
+
+---
+Task 8: Create/Copy/Rename/Move Directory
+
+Command to create directory:
+mkdir /opt/data
+
+Command to copy file:
+cp /etc/dnf/dnf.conf /opt/data/
+
+Command to rename file:
+mv /opt/data/dnf.conf /opt/data/dnf.conf.backup
+
+Command to move directory:
+mv /opt/data /var/tmp/data_backup
+
+---
+Task 9: Hard and Soft Links
+
+Command to create source file:
+echo "Link source content" > /opt/link_target.txt
+
+Command to create hard link:
+ln /opt/link_target.txt /tmp/link_target.hard
+
+Command to create symbolic (soft) link:
+ln -s /opt/link_target.txt /tmp/link_target.soft
+
+---
+Task 10: Permissions and Ownership
+
+Command to create file:
+touch /opt/executable.sh
+
+Command to set permissions (octal 750 = rwxr-x---):
+chmod 750 /opt/executable.sh
+
+Command to change owner and group:
+sudo chown root:wheel /opt/executable.sh
+
+---
+Task 11: System Documentation
+
+Command to view 'chmod' manual page:
+man chmod
+
+Commands to find 'chrony' package documentation:
+rpm -qd chrony
+ls /usr/share/doc/chrony*
+
+---
+Task 12: Script - check_service.sh
+
+Create file /usr/local/sbin/check_service.sh with content:
+#!/bin/bash
+if [ "$#" -ne 1 ]; then
+  echo "Usage: check_service.sh <service_name>" >&2
+  exit 1
+fi
+SERVICE_NAME="$1"
+if systemctl is-active --quiet "$SERVICE_NAME"; then
+  echo "$SERVICE_NAME is running."
+else
+  echo "$SERVICE_NAME is not running."
+fi
+exit 0
+
+Make executable:
+sudo chmod +x /usr/local/sbin/check_service.sh
+
+---
+Task 13: Script - list_files_by_ext.sh
+
+Create file /usr/local/sbin/list_files_by_ext.sh with content:
+#!/bin/bash
+if [ "$#" -ne 1 ]; then
+  echo "Usage: list_files_by_ext.sh <extension>" >&2
+  exit 1
+fi
+EXTENSION="$1"
+SOURCE_DIR="/etc"
+FOUND=0
+for FILEPATH in "$SOURCE_DIR"/*."$EXTENSION"; do
+  # Check if the glob found an actual file, not just the pattern itself
+  if [ -f "$FILEPATH" ]; then
+    FILENAME=$(basename "$FILEPATH")
+    echo "Found file: $FILENAME"
+    FOUND=1
+  fi
+done
+if [ "$FOUND" -eq 0 ]; then
+    echo "No files found with extension .$EXTENSION in $SOURCE_DIR"
+fi
+exit 0
+
+Make executable:
+sudo chmod +x /usr/local/sbin/list_files_by_ext.sh
+
+---
+Task 14: Script - arg_processor.sh
+
+Create file /usr/local/sbin/arg_processor.sh with content:
+#!/bin/bash
+if [ "$#" -ne 2 ]; then
+  echo "Usage: arg_processor.sh <input> <output>" >&2
+  exit 1
+fi
+INPUT_ARG="$1"
+OUTPUT_ARG="$2"
+echo "Input file: $INPUT_ARG Output file: $OUTPUT_ARG"
+exit 0
+
+Make executable:
+sudo chmod +x /usr/local/sbin/arg_processor.sh
+
+---
+Task 15: Script - get_mem_info.sh
+
+Create file /usr/local/sbin/get_mem_info.sh with content:
+#!/bin/bash
+MEM_INFO=$(free -m)
+echo "Memory Information:"
+echo "$MEM_INFO"
+exit 0
+
+Make executable:
+sudo chmod +x /usr/local/sbin/get_mem_info.sh
+
+---
+Task 16: Reboot / Cancel Shutdown
+
+Command for immediate reboot:
+sudo systemctl reboot
+
+Command to schedule power off in 30 mins with message:
+sudo shutdown +30 "System powering down for maintenance."
+
+Command to cancel pending shutdown:
+sudo shutdown -c
+
+---
+Task 17: Boot to multi-user.target Manually
+
+Steps:
+1. Reboot.
+2. At GRUB menu, select kernel, press 'e'.
+3. Find 'linux' line.
+4. Append `systemd.unit=multi-user.target`.
+5. Press Ctrl+x or F10.
+
+---
+Task 18: Root Password Reset
+
+Steps:
+1. Reboot, press 'e' at GRUB.
+2. Find 'linux' line, change 'ro' to 'rw'.
+3. Append `init=/bin/bash`.
+4. Press Ctrl+x or F10.
+5. At '#' prompt, type `passwd root` and set new password.
+6. If needed: `mount -o remount,rw /`.
+7. Run `touch /.autorelabel`.
+8. Run `exec /sbin/init` or `reboot -f`.
+
+---
+Task 19: Find and Kill Process (TERM)
+
+Command to find PID:
+pgrep chronyd
+(Or `systemctl status chronyd` shows PID)
+
+Command to send TERM signal (replace PID):
+sudo kill <PID>
+
+Command to verify status:
+systemctl is-active chronyd
+
+---
+Task 20: Adjust Process Priority (renice)
+
+Start a background sleep process (if none running):
+sleep 300 &
+
+Command to find PID:
+pgrep sleep
+
+Command to change niceness (replace PID):
+sudo renice -n 10 <PID>
+
+Command to verify (replace PID):
+ps -o pid,ni,comm -p <PID>
+
+---
+Task 21: Manage Tuned Profiles
+
+Command to check active profile:
+tuned-adm active
+
+Command to find recommended profile:
+tuned-adm recommend
+
+Command to apply recommended profile (capture first):
+RECOMMENDED=$(tuned-adm recommend)
+sudo tuned-adm profile "$RECOMMENDED"
+
+Verify change:
+tuned-adm active
+
+---
+Task 22: Using journalctl
+
+Command for kernel messages from current boot:
+sudo journalctl -k -b 0
+
+Command for last 10 sshd error messages:
+sudo journalctl -u sshd -p err -n 10 -r
+
+---
+Task 23: Preserve System Journals
+
+Command to check current storage:
+ls /var/log/journal || journalctl --disk-usage
+
+Command to enable persistence (if needed):
+sudo mkdir -p /var/log/journal
+sudo systemctl restart systemd-journald
+
+Verify persistence:
+journalctl --disk-usage
+
+---
+Task 24: Start/Stop/Enable Services
+
+Command to check if firewalld is enabled:
+systemctl is-enabled firewalld
+
+Command to start httpd now:
+sudo systemctl start httpd
+
+Command to stop cups now:
+sudo systemctl stop cups
+
+---
+Task 25: Secure File Transfer
+
+Command to copy file with scp:
+scp /etc/motd remoteadmin@backup.example.com:/tmp/
+
+Command to sync directory with rsync:
+rsync -avz --compress --perms /srv/web/ webmaster@web.example.com:/var/www/html/
+(Note trailing slash on source to copy contents)
+
+---
+Task 26: Partition Disk for LVM
+
+Partition using fdisk (MBR example):
+sudo fdisk /dev/sdb
+> n (new)
+> p (primary)
+> 1 (partition number)
+> Enter (default start)
+> +500M (size)
+> t (change type)
+> 1 (select partition 1)
+> 8e (Linux LVM type code)
+> n (new)
+> p (primary)
+> 2 (partition number)
+> Enter (default start)
+> +1.5G (size)
+> t (change type)
+> 2 (select partition 2)
+> 8e (Linux LVM type code)
+> p (print to verify)
+> w (write changes)
+
+Inform kernel:
+sudo partprobe /dev/sdb
+
+---
+Task 27: Create LVM Physical Volume (PV)
+
+Command to create PVs:
+sudo pvcreate /dev/sdb1 /dev/sdb2
+
+Command to verify:
+sudo pvs
+sudo pvdisplay /dev/sdb1 /dev/sdb2
+
+---
+Task 28: Create/Extend LVM Volume Group (VG)
+
+Command to create VG:
+sudo vgcreate vg_app /dev/sdb1
+
+Command to extend VG:
+sudo vgextend vg_app /dev/sdb2
+
+Command to verify:
+sudo vgs vg_app
+sudo vgdisplay vg_app
+
+---
+Task 29: Create/Delete LVM Logical Volume (LV)
+
+Command to create lv_app_data:
+sudo lvcreate -L 450M -n lv_app_data vg_app
+
+Command to create lv_app_logs:
+sudo lvcreate -l 50%FREE -n lv_app_logs vg_app
+
+Command to remove lv_app_logs:
+sudo lvremove /dev/vg_app/lv_app_logs
+(Confirm 'y' when prompted)
+
+Command to verify:
+sudo lvs vg_app
+
+---
+Task 30: Format and Mount LV Persistently by LABEL
+
+Command to format and label:
+sudo mkfs.xfs -L APP-DATA /dev/vg_app/lv_app_data
+
+Command to create mount point:
+sudo mkdir /srv/appdata
+
+Edit /etc/fstab:
+sudo vi /etc/fstab
+Add line:
+LABEL=APP-DATA  /srv/appdata  xfs  defaults  0  0
+
+Command to test mount:
+sudo mount -a
+
+Command to verify:
+findmnt /srv/appdata
+df -hT /srv/appdata
+
+---
+Task 31: Add Swap Partition
+
+Create 1G partition (e.g., /dev/sdc1) using fdisk/gdisk:
+(Steps similar to Task 26, set size +1G, set type Linux Swap '82' or '8200')
+sudo partprobe /dev/sdc
+
+Format as swap:
+sudo mkswap /dev/sdc1
+
+Get UUID:
+sudo blkid /dev/sdc1
+
+Enable swap now:
+sudo swapon /dev/sdc1
+
+Edit /etc/fstab:
+sudo vi /etc/fstab
+Add line (replace UUID_VALUE):
+UUID=UUID_VALUE  none  swap  defaults  0  0
+
+Verify:
+swapon -s
+
+---
+Task 32: Format and Mount VFAT/ext4
+
+Format ext4 partition:
+sudo mkfs.ext4 -L EXT4-DATA /dev/sdb1
+
+Format VFAT partition:
+sudo mkfs.vfat -n VFAT-SHARE /dev/sdb2
+
+Create mount points:
+sudo mkdir /mnt/ext4data /mnt/vfatshare
+
+Mount manually:
+sudo mount LABEL=EXT4-DATA /mnt/ext4data
+sudo mount LABEL=VFAT-SHARE /mnt/vfatshare
+
+Unmount:
+sudo umount /mnt/ext4data
+sudo umount /mnt/vfatshare
+
+---
+Task 33: NFS Mount (Conceptual)
+
+Command to mount read-only:
+sudo mount -t nfs -o ro nfssrv.example.com:/exports/readonly /mnt/nfs_ro
+
+Option for fstab network dependency:
+_netdev
+
+---
+Task 34: Configure Autofs (-hosts)
+
+Install autofs:
+sudo dnf install autofs
+
+Edit master map (/etc/auto.master or /etc/auto.master.d/hosts.conf):
+Add line:
+/direct -hosts --timeout=60 # Example timeout
+
+Enable and start service:
+sudo systemctl enable --now autofs
+
+Verification:
+cd /direct/nfsserver.example.com # Should trigger mounts of shares from that host
+df -h
+
+---
+Task 35: Extend LVM LV and Filesystem
+
+Command to extend LV and XFS filesystem:
+sudo lvextend -r -L +100M /dev/vg_app/lv_app_data
+
+Verification:
+sudo lvs /dev/vg_app/lv_app_data
+df -h /srv/appdata
+
+---
+Task 36: Configure Set-GID Directory
+
+Create group:
+sudo groupadd collaborators
+
+Create directory:
+sudo mkdir /data/collaboration
+
+Set group ownership:
+sudo chown :collaborators /data/collaboration
+
+Set permissions and SGID:
+sudo chmod 2770 /data/collaboration
+
+Verification:
+ls -ld /data/collaboration
+
+---
+Task 37: Diagnose Permission Problem (Conceptual)
+
+Commands to use:
+ls -l /srv/appdata/config.log # Check standard perms/owner/group
+ls -ld /srv/appdata # Check parent dir perms (need x)
+ls -ld /srv # Check parent dir perms (need x)
+id webadmin # Check group memberships
+getfacl /srv/appdata/config.log # Check ACLs
+findmnt /srv/appdata # Check mount options (ro? noexec?)
+
+---
+Task 38: Schedule Tasks (at/cron)
+
+Command to schedule 'at' job:
+echo '/usr/local/bin/nightly_job.sh' | at 23:30
+
+Command to edit webmonitor's crontab:
+sudo crontab -u webmonitor -e
+Add line:
+*/15 * * * * /home/webmonitor/check_site.sh
+
+Verify cron job:
+sudo crontab -l -u webmonitor
+
+---
+Task 39: Service Enable/Disable
+
+Command to disable cups:
+sudo systemctl disable cups
+
+Commands to enable and ensure sshd is running:
+sudo systemctl enable sshd
+sudo systemctl start sshd # Or use enable --now
+
+Verify:
+systemctl is-enabled cups
+systemctl is-enabled sshd
+systemctl is-active sshd
+
+---
+Task 40: Configure Default Target
+
+Command to set default target:
+sudo systemctl set-default graphical.target
+
+Command to verify:
+systemctl get-default
+
+---
+Task 41: Configure Time Client (chrony)
+
+Edit chrony config file:
+sudo vi /etc/chrony.conf
+(Comment out/remove existing server/pool lines, add: pool pool.ntp.org iburst)
+
+Restart and enable service:
+sudo systemctl restart chronyd
+sudo systemctl enable chronyd
+
+Verify sources and sync status:
+chronyc sources
+chronyc tracking
+timedatectl status
+
+---
+Task 42: Install/Update/Remove Packages
+Install tmux:
+sudo dnf install tmux -y
+
+Update bash only:
+sudo dnf update bash -y
+
+Remove telnet:
+sudo dnf remove telnet -y
+
+---
+Task 43: Modify Bootloader (grubby)
+
+Add kernel argument:
+sudo grubby --update-kernel=DEFAULT --args="audit=1"
+
+Remove kernel argument:
+sudo grubby --update-kernel=DEFAULT --remove-args="rhgb"
+
+Verify:
+sudo grubby --info=DEFAULT
+
+---
+Task 44: Configure Static IPv4 & IPv6 (nmcli)
+
+Configure connection (replace 'ens3'):
+sudo nmcli con modify ens3 ipv4.method manual ipv4.addresses 192.168.10.50/24 ipv4.gateway 192.168.10.1 ipv4.dns "192.168.10.1,8.8.8.8" ipv6.method manual ipv6.addresses 2001:db8:10::50/64 ipv6.gateway 2001:db8:10::1
+
+Apply changes:
+sudo nmcli con down ens3 && sudo nmcli con up ens3
+
+Verify:
+ip addr show ens3
+ip route show default
+ip -6 route show default
+cat /etc/resolv.conf
+
+---
+Task 45: Configure Hostname Resolution
+
+Set hostname:
+sudo hostnamectl set-hostname client5.internal.domain
+
+Edit hosts file:
+sudo vi /etc/hosts
+Add line:
+192.168.10.200  fileserver.internal.domain fileserver
+
+Verify:
+hostnamectl status
+grep fileserver /etc/hosts
+
+---
+Task 46: Configure Service Auto-start
+
+Enable NetworkManager:
+sudo systemctl enable NetworkManager
+
+Enable firewalld:
+sudo systemctl enable firewalld
+
+Verify:
+systemctl is-enabled NetworkManager
+systemctl is-enabled firewalld
+
+---
+Task 47: Configure Firewall (firewalld)
+
+Remove ssh service permanently:
+sudo firewall-cmd --permanent --zone=public --remove-service=ssh
+
+Add http service permanently:
+sudo firewall-cmd --permanent --zone=public --add-service=http
+
+Add port 2222/tcp permanently:
+sudo firewall-cmd --permanent --zone=public --add-port=2222/tcp
+
+Reload firewall:
+sudo firewall-cmd --reload
+
+Verify:
+sudo firewall-cmd --list-all --zone=public
+
+---
+Task 48: Create User Account
+
+Create user:
+sudo useradd -u 1500 -c "Application Service Account" -g users -G wheel -s /bin/bash appuser
+
+Verify:
+id appuser
+getent passwd appuser
+
+---
+Task 49: Password Aging
+
+Set password:
+sudo passwd appuser
+(Enter Str0ngP@ss! twice)
+
+Set max age:
+sudo chage -M 90 appuser
+
+Set warning period:
+sudo chage -W 14 appuser
+
+Verify:
+sudo chage -l appuser
+
+---
+Task 50: Group Management
+
+Create group:
+sudo groupadd -g 2000 auditors
+
+Add members:
+sudo usermod -aG auditors mary
+sudo usermod -aG auditors alice
+
+Remove member:
+sudo gpasswd -d mary auditors
+(Or `sudo usermod -G <other_groups_alice_is_in> alice` - careful!)
+
+Verify:
+getent group auditors
+id mary
+id alice
+
+---
+Task 51: Configure Sudo (visudo)
+
+Edit sudoers safely:
+sudo visudo
+
+Ensure this line exists and is uncommented:
+%wheel ALL=(ALL) ALL
+
+Save and exit.
+
+---
+Task 52: Firewall Zones/Sources
+
+Add source to internal zone:
+sudo firewall-cmd --permanent --zone=internal --add-source=10.0.1.0/24
+
+Add services to internal zone:
+sudo firewall-cmd --permanent --zone=internal --add-service=ssh
+sudo firewall-cmd --permanent --zone=internal --add-service=https
+
+Reload firewall:
+sudo firewall-cmd --reload
+
+Verify:
+sudo firewall-cmd --list-all --zone=internal
+
+---
+Task 53: Default File Permissions (umask)
+
+Edit system-wide profile or bashrc (e.g.):
+sudo vi /etc/bashrc
+Add line at the end:
+umask 0027
+
+Verify:
+Log out and log back in (or start new shell).
+umask # Should show 0027
+
+---
+Task 54: SSH Key-Based Authentication
+
+Generate key pair:
+ssh-keygen -t ed25519
+(Press Enter for defaults, leave passphrase blank)
+
+Copy public key to remote server:
+ssh-copy-id remoteuser@remote.example.com
+
+Verify:
+ssh remoteuser@remote.example.com # Should log in without password
+
+---
+Task 55: SELinux Modes
+
+Check current mode:
+getenforce
+
+Set permissive temporarily:
+sudo setenforce 0
+getenforce # Verify
+
+Set enforcing temporarily:
+sudo setenforce 1
+getenforce # Verify
+
+Check persistent setting:
+grep '^SELINUX=' /etc/selinux/config
+
+---
+Task 56: List SELinux Contexts
+
+Context of file:
+ls -Z /etc/passwd
+
+Context of sshd processes:
+ps auxZ | grep sshd
+
+---
+Task 57: Restore SELinux Context
+
+Command to restore defaults recursively:
+sudo restorecon -Rv /srv/webcontent
+
+Verify (check context of a file inside):
+ls -Z /srv/webcontent/index.html # Example
+
+---
+Task 58: Manage SELinux Port Labels
+
+Install semanage if needed:
+sudo dnf install policycoreutils-python-utils -y
+
+Add port label:
+sudo semanage port -a -t http_port_t -p tcp 8081
+
+Verify:
+sudo semanage port -l | grep http_port_t
+
+---
+Task 59: Manage SELinux Booleans
+
+Enable boolean persistently:
+sudo setsebool -P httpd_can_network_relay on
+
+Disable boolean persistently:
+sudo setsebool -P ftpd_full_access off
+
+Verify:
+getsebool httpd_can_network_relay
+getsebool ftpd_full_access
+
+---
+Task 60: Diagnose SELinux (Conceptual)
+
+Workflow:
+1. Reproduce error while SELinux is Enforcing.
+2. Check audit logs: `sudo sealert -a /var/log/audit/audit.log` or `sudo ausearch -m avc -ts recent -i`.
+3. Identify denial details: scontext, tcontext, tclass, comm, suggested fixes.
+4. (Optional) Test in Permissive mode: `sudo setenforce 0`, retry, `sudo setenforce 1`.
+5. Apply fix based on denial type:
+    - Incorrect context -> `sudo restorecon -Rv <path>` or `semanage fcontext ... && restorecon ...`.
+    - Boolean needed -> `sudo setsebool -P <boolean_name> on`.
+    - Port label needed -> `sudo semanage port -a -t <type> ...`.
+6. Retest.
+
+---
+Task 61: Container Find/Retrieve Images
+
+Search for images:
+podman search mariadb
+
+Pull official image:
+podman pull docker.io/library/mariadb:latest
+(Or just `podman pull mariadb`)
+
+List local images:
+podman images
+
+---
+Task 62: Container Inspect Images
+
+Inspect environment variables (using jq):
+podman image inspect mariadb:latest | jq '.[0].Config.Env'
+
+Inspect build history:
+podman image history mariadb:latest
+
+---
+Task 63: Container Management (skopeo)
+
+Install skopeo:
+sudo dnf install skopeo -y
+
+Inspect remote UBI image:
+skopeo inspect docker://registry.access.redhat.com/ubi9/ubi:latest
+
+Copy local image to directory:
+skopeo copy containers-storage:mariadb:latest dir:/opt/mariadb-image-dir
+
+---
+Task 64: Container Basic Management (Lifecycle)
+
+Run container:
+podman run -d --name db1 mariadb:latest
+
+List all containers:
+podman ps -a
+
+Stop container:
+podman stop db1
+
+Start container:
+podman start db1
+
+Remove container:
+podman rm db1
+
+---
+Task 65: Container Run Service with Port Mapping
+
+Run nginx container:
+podman run -d --name webserver -p 8088:80 docker.io/library/nginx
+
+Verify:
+podman ps # Check PORTS column
+
+---
+Task 66: Container Systemd Service
+
+Generate unit file:
+sudo podman generate systemd --name --files --restart-policy=always -f /etc/systemd/system/container-webserver.service webserver
+
+Reload systemd:
+sudo systemctl daemon-reload
+
+Enable and start service:
+sudo systemctl enable --now container-webserver.service
+
+Verify:
+sudo systemctl status container-webserver.service
+
+---
+Task 67: Container Persistent Storage (Named Volume)
+
+Create volume:
+podman volume create webapp_data
+
+Run container with volume mount:
+podman run -d --name appserver -v webapp_data:/usr/local/apache2/htdocs:Z docker.io/library/httpd
+(Added :Z for potential SELinux issues)
+
+Verify:
+podman volume ls
+podman inspect appserver | jq '.[0].Mounts'

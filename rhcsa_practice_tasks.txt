@@ -1,0 +1,263 @@
+RHCSA Practice Tasks
+
+Section 1: Understand and use essential tools
+1.  List the files located in the `/var/log` directory using long format.
+Display the current system date and time.
+
+2.  Execute the command `find /usr -name 'python*'`.
+Redirect its standard output to `/tmp/python_files.log`.
+Redirect its standard error to `/tmp/python_errors.log`.
+Append the current working directory path to the end of `/tmp/python_files.log`.
+
+3.  Search the `/etc/passwd` file for lines containing the exact text "root".
+Save only these matching lines to `/tmp/root_lines.txt`.
+Search the `/etc/services` file for lines defining the `https` service, ignoring case.
+Exclude commented lines starting with '#'.
+Save the result to `/tmp/https_service.txt`.
+
+4.  Connect via SSH to the host `server1.lab.example.com` as user `testuser` using port `2222`.
+
+5.  Switch to the `root` user, ensuring a clean environment (home directory change, etc.).
+Verify the current user is root.
+Exit back to the original user shell.
+Run the command `dnf list installed` with root privileges without fully switching to the root user shell.
+
+6.  Create a bzip2 compressed tar archive named `/opt/etc_configs.tar.bz2`.
+The archive must contain the files `/etc/hosts`, `/etc/resolv.conf`, and the directory `/etc/sysconfig/`.
+List the contents of the created archive without extracting it to verify its contents.
+
+7.  Create an empty file named `/opt/myapp.conf`.
+Using a text editor, create a file named `/opt/readme.txt` containing the single line: Application Readme File
+
+8.  Create a directory named `/opt/data`.
+Copy the file `/etc/dnf/dnf.conf` into the `/opt/data` directory.
+Rename the copied file inside `/opt/data` to `dnf.conf.backup`.
+Move the entire `/opt/data` directory to `/var/tmp/data_backup`.
+
+9.  Create a file named `/opt/link_target.txt` with any content.
+Create a hard link named `/tmp/link_target.hard` pointing to `/opt/link_target.txt`.
+Create a symbolic link named `/tmp/link_target.soft` pointing to `/opt/link_target.txt`.
+
+10. Create a file named `/opt/executable.sh`.
+Set its permissions using octal notation: owner=rwx, group=rx, other=---.
+Change the owner to `root` and the group owner to `wheel`. (Assume group 'wheel' exists).
+
+11. Display the manual page for the `chmod` command.
+Find the location of documentation files installed specifically by the `chrony` package.
+
+Section 2: Create simple shell scripts
+12. Create an executable shell script named `/usr/local/sbin/check_service.sh`.
+The script must accept exactly one argument, the name of a systemd service.
+If the service is active (use `systemctl is-active`), the script should output "SERVICE is running.".
+If the service is inactive, the script should output "SERVICE is not running.".
+(Replace SERVICE with the actual service name provided as the argument).
+
+13. Create an executable shell script named `/usr/local/sbin/list_files_by_ext.sh`.
+The script should accept one argument: a file extension (e.g., "log", "conf").
+It should use a `for` loop to iterate through all files matching `*.$EXTENSION` in the `/etc` directory (where $EXTENSION is the argument).
+For each matching file found, it should print "Found file: FILENAME".
+
+14. Create an executable shell script named `/usr/local/sbin/arg_processor.sh`.
+The script should check if exactly two arguments were provided (`$#`).
+If not two arguments, it should print "Usage: arg_processor.sh <input> <output>" to standard error and exit with status 1.
+If exactly two arguments are provided, it should print "Input file: $1 Output file: $2".
+
+15. Create an executable shell script named `/usr/local/sbin/get_mem_info.sh`.
+The script should capture the output of the `free -m` command into a variable.
+It should then print "Memory Information:" followed by the captured output.
+
+Section 3: Operate running systems
+16. Schedule an immediate, clean system reboot.
+Schedule a system power off to occur in 30 minutes, displaying the message "System powering down for maintenance.".
+Cancel any pending shutdown.
+
+17. Describe the steps required to boot the system temporarily into the `multi-user.target` using the GRUB menu, without changing the persistent default target.
+
+18. Describe the steps required to reset an unknown root password using the GRUB boot menu, including the necessary actions for SELinux context restoration.
+
+19. Identify the process ID (PID) of the `chronyd` service.
+Send a `TERM` (terminate) signal to this PID.
+Verify if the `chronyd` service is still active after sending the signal.
+
+20. Identify the PID for any running `sleep` command (you may need to start one in the background: `sleep 300 &`).
+Change the niceness value of this `sleep` process to `10`.
+Verify the new niceness value using `ps`.
+
+21. Check the currently active `tuned` profile.
+Determine the recommended `tuned` profile for the system.
+Set the system to use the recommended profile persistently.
+
+22. Display only kernel messages from the current boot using `journalctl`.
+Display the last 20 messages logged by the `sshd` service using `journalctl`.
+
+23. Check if the systemd journal is configured for persistent storage.
+If it is not persistent, perform the steps to enable persistent storage in `/var/log/journal`.
+
+24. Check if the `firewalld` service is enabled to start on boot.
+Start the `httpd` service for the current session only.
+Stop the `cups` service (if installed) for the current session only.
+
+25. Securely copy the local file `/etc/motd` to the remote host `backup.example.com` into the `/tmp` directory as user `remoteadmin`.
+Use `rsync` to efficiently synchronize the contents of the local directory `/srv/web` to the remote directory `/var/www/html` on host `web.example.com` as user `webmaster`, compressing data and preserving permissions.
+
+Section 4: Configure local storage
+26. Using `fdisk` or `gdisk` on an available disk (e.g., `/dev/sdb`, assume available), create two new primary partitions.
+Partition 1 should be 500 MiB.
+Partition 2 should be 1.5 GiB.
+Set the type for both partitions to `Linux LVM`.
+Ensure the kernel recognizes the new partitions.
+
+27. Initialize the newly created partitions `/dev/sdb1` and `/dev/sdb2` as LVM Physical Volumes.
+Verify the PVs were created.
+
+28. Create a new LVM Volume Group named `vg_app` using the Physical Volume `/dev/sdb1`.
+Extend the `vg_app` Volume Group by adding the Physical Volume `/dev/sdb2`.
+Verify the VG includes both PVs and its total size reflects this.
+
+29. Create a new LVM Logical Volume named `lv_app_data` within the `vg_app` Volume Group with a size of 450 MiB.
+Create another LVM Logical Volume named `lv_app_logs` within `vg_app` using 50% of the *remaining* free space in the VG.
+Remove the `lv_app_logs` logical volume.
+
+30. Format the Logical Volume `/dev/vg_app/lv_app_data` with the XFS filesystem and assign it the label `APP-DATA`.
+Create the mount point directory `/srv/appdata`.
+Configure the system to mount this volume persistently on `/srv/appdata` at boot using its LABEL.
+Test the mount configuration.
+
+31. Add a new 1 GiB swap partition using an available disk (e.g., `/dev/sdc`).
+Ensure the swap space is activated immediately and configured to be mounted automatically on boot using its UUID.
+
+Section 5: Create and configure file systems
+32. Format the partition `/dev/sdb1` (assume exists) with the `ext4` filesystem, giving it the label `EXT4-DATA`.
+Format the partition `/dev/sdb2` (assume exists) with the `vfat` filesystem, giving it the label `VFAT-SHARE`.
+Create mount points `/mnt/ext4data` and `/mnt/vfatshare`.
+Mount `/dev/sdb1` on `/mnt/ext4data` manually.
+Mount `/dev/sdb2` on `/mnt/vfatshare` manually.
+Unmount both filesystems.
+
+33. Mount the NFS share `nfssrv.example.com:/exports/readonly` onto the local directory `/mnt/nfs_ro` ensuring it is mounted read-only.
+Unmount the share.
+
+34. Configure `autofs` to use the map file `/etc/auto.direct`.
+When `/direct/<hostname>` is accessed, it should mount all exported NFS shares from `<hostname>`. (Hint: Use the `-hosts` map type).
+Ensure the `autofs` service is running and enabled.
+
+35. Extend the logical volume `/dev/vg_app/lv_app_data` (assume it exists, contains XFS, and is mounted on /srv/appdata) by 100 MiB.
+Ensure the XFS filesystem is also resized to use the new space.
+
+36. Create a directory `/data/collaboration`.
+Create a group named `collaborators`.
+Configure the directory to be group-owned by `collaborators` and have the Set-GID bit enabled.
+Set permissions so only the owner and group members have full access (rwx).
+
+37. A user `testuser` reports being unable to write to `/srv/appdata/config.log` despite having standard write permissions.
+Diagnose the permission problem considering standard permissions, path permissions, ACLs, and mount options (assume SELinux is permissive for this check). Describe the commands you would use.
+
+Section 6: Deploy, configure, and maintain systems
+38. Schedule the command `/usr/local/bin/nightly_job.sh` to run once tonight at 11:30 PM using `at`.
+Configure a cron job for the user `webmonitor` to run the script `/home/webmonitor/check_site.sh` every 15 minutes.
+
+39. Ensure the `cups` service (if installed) is disabled from starting automatically on boot.
+Ensure the `sshd` service is enabled to start automatically on boot and is currently running.
+
+40. Set the system's default boot target persistently to `graphical.target`.
+
+41. Configure the system as an NTP client to synchronize time with `pool.ntp.org`.
+Ensure the `chronyd` service is running and enabled.
+
+42. Using the available repositories, install the package `tmux`.
+Update only the `bash` package if an update is available.
+Remove the package `telnet` if it is installed.
+
+43. Add the kernel boot parameter `audit=1` to the default kernel entry persistently using `grubby`.
+Remove the kernel boot parameter `rhgb` (if present) from the default kernel entry persistently using `grubby`.
+
+Section 7: Manage basic networking
+44. Configure the primary network interface (e.g., `ens3`) with the static IPv4 address `192.168.10.50/24`, gateway `192.168.10.1`, and DNS servers `192.168.10.1` and `8.8.8.8`.
+Also, configure a static IPv6 address `2001:db8:10::50/64` with gateway `2001:db8:10::1`.
+Ensure the configuration is persistent.
+
+45. Set the system's hostname persistently to `client5.internal.domain`.
+Add a static entry to `/etc/hosts` mapping the IP `192.168.10.200` to the hostname `fileserver.internal.domain`.
+
+46. Ensure the `NetworkManager` service is configured to start automatically at boot.
+Ensure the `firewalld` service is configured to start automatically at boot.
+
+47. Configure the firewall (`firewalld`) for the `public` zone.
+Permanently remove the `ssh` service.
+Permanently add the `http` service.
+Permanently add access to TCP port 2222.
+Reload the firewall to apply changes.
+
+Section 8: Manage users and groups
+48. Create a local user account named `appuser` with UID `1500`.
+Assign the user the comment "Application Service Account".
+Set the user's primary group to `users` (assume group exists).
+Add the user to the supplementary group `wheel`.
+Set the user's shell to `/bin/bash`.
+
+49. Set the password for user `appuser` to `Str0ngP@ss!`.
+Configure the password for `appuser` to expire after 90 days.
+Set the password warning period to 14 days.
+
+50. Create a local group named `auditors` with GID `2000`.
+Add the existing users `mary` and `alice` as members of the `auditors` group.
+Remove user `mary` from the `auditors` group.
+
+51. Grant members of the `wheel` group the ability to run all commands as root using `sudo`.
+Edit the configuration using `visudo`.
+
+Section 9: Manage security
+52. Configure the firewall (`firewalld`) for the `internal` zone.
+Permanently add the source network `10.0.1.0/24` to this zone.
+Permanently allow the `ssh` and `https` services for this zone.
+Reload the firewall.
+
+53. Set the default `umask` value persistently for new login shells system-wide to `0027`.
+
+54. Generate an `ed25519` SSH key pair for the current user without a passphrase.
+Copy the public key to the user `remoteuser` on host `remote.example.com` to enable key-based login.
+
+55. Ensure SELinux is running in `Enforcing` mode.
+Set SELinux to `Permissive` mode temporarily for troubleshooting.
+Set SELinux back to `Enforcing` mode temporarily.
+
+56. Display the SELinux context of the `/etc/passwd` file.
+Display the SELinux context of the currently running `sshd` processes.
+
+57. The files in `/srv/webcontent` were restored from a backup and have incorrect SELinux contexts.
+Restore the default SELinux contexts for all files and directories within `/srv/webcontent` recursively.
+
+58. Configure the SELinux policy persistently to allow processes requiring the `http_port_t` label to bind to TCP port 8081.
+
+59. Persistently enable the SELinux boolean `httpd_can_network_relay`.
+Persistently disable the SELinux boolean `ftpd_full_access`.
+
+60. Describe the general workflow for diagnosing an SELinux denial using `sealert` or `ausearch` and common resolution steps (context, boolean, port).
+
+Section 10: Manage containers
+61. Search available registries for container images related to `mariadb`.
+Pull the official `mariadb` image with the `latest` tag from Docker Hub.
+List the container images currently stored locally.
+
+62. Inspect the local `mariadb:latest` image and display its defined environment variables.
+Inspect the local `mariadb:latest` image and display its build history (layers).
+
+63. Using `skopeo`, inspect the remote image `registry.access.redhat.com/ubi9/ubi:latest` without pulling it.
+Using `skopeo`, copy the local `mariadb:latest` image to a directory structure at `/opt/mariadb-image-dir`.
+
+64. Run a container in detached mode from the `mariadb:latest` image named `db1`.
+List all containers (running and stopped).
+Stop the `db1` container.
+Start the `db1` container.
+Remove the `db1` container.
+
+65. Run a container service in detached mode from the `nginx:latest` image named `webserver`.
+Map host port 8088 to the container's port 80.
+
+66. Generate a systemd unit file for the running container `webserver` (created previously) using the `--name` option.
+Place the generated file in `/etc/systemd/system/`.
+Reload systemd, enable the service, and start it.
+
+67. Create a Podman named volume called `webapp_data`.
+Run a container in detached mode from the `httpd:latest` image named `appserver`.
+Mount the `webapp_data` volume to `/usr/local/apache2/htdocs/` inside the container.
