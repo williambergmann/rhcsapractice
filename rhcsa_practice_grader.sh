@@ -339,7 +339,6 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 7: Create/Edit Files
 CURRENT_TASK=7; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Create/Edit Files${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-rm -f /opt/myapp.conf /opt/readme.txt &>/dev/null
 check_file_exists "/opt/myapp.conf"; if [[ $? -eq 0 ]] && [[ $(stat -c %s /opt/myapp.conf) -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 7)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /opt/myapp.conf exists and is empty."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /opt/myapp.conf missing or not empty."; fi
 check_file_exists "/opt/readme.txt"; if [[ $? -eq 0 ]]; then check_file_content "/opt/readme.txt" "^Application Readme File$" "-Fx"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 8)); fi; fi
 T_SCORE=$TASK_POINTS
@@ -357,10 +356,8 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 9: Hard and Soft Links
 CURRENT_TASK=9; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Hard and Soft Links${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-rm -f /opt/link_target.txt /tmp/link_target.hard /tmp/link_target.soft &>/dev/null; echo "Link source 9" > /opt/link_target.txt
 check_file_exists "/tmp/link_target.hard"; if [[ $? -eq 0 ]]; then INODE_ORIG_9=$(stat -c %i /opt/link_target.txt 2>/dev/null); INODE_HARD_9=$(stat -c %i /tmp/link_target.hard 2>/dev/null); LINK_COUNT_9=$(stat -c %h /opt/link_target.txt 2>/dev/null); if [[ -n "$INODE_ORIG_9" ]] && [[ "$INODE_ORIG_9" == "$INODE_HARD_9" ]] && [[ "$LINK_COUNT_9" -ge 2 ]]; then TASK_POINTS=$((TASK_POINTS + 7)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Hard link correct."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Hard link incorrect."; fi; fi
 check_file_exists "/tmp/link_target.soft"; if [[ $? -eq 0 ]]; then if [[ -L "/tmp/link_target.soft" ]] && [[ $(readlink /tmp/link_target.soft) == "/opt/link_target.txt" ]]; then TASK_POINTS=$((TASK_POINTS + 8)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Soft link correct."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Soft link incorrect."; fi; fi
-rm -f /opt/link_target.txt &>/dev/null
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
 echo -e "\n" | tee -a ${REPORT_FILE}
@@ -369,7 +366,6 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 CURRENT_TASK=10; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Permissions and Ownership${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
 check_file_exists "/opt/executable.sh"; if [[ $? -eq 0 ]]; then if [[ $(stat -c %a /opt/executable.sh) == "750" ]]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Perms 750 ok."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Perms not 750."; fi; if [[ $(stat -c %U /opt/executable.sh) == "root" ]]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Owner root ok."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Owner not root."; fi; if [[ $(stat -c %G /opt/executable.sh) == "wheel" ]]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Group wheel ok."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Group not wheel."; fi; fi
-rm -f /opt/executable.sh &>/dev/null
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
 echo -e "\n" | tee -a ${REPORT_FILE}
@@ -394,7 +390,6 @@ CURRENT_TASK=13; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Script - l
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
 SCRIPT_PATH_13="/usr/local/sbin/list_files_by_ext.sh"; touch /etc/dummy_test_script_13.log
 check_file_exists "$SCRIPT_PATH_13"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 5)); if [ -x "$SCRIPT_PATH_13" ]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Script executable."; if "$SCRIPT_PATH_13" log 2>&1 | grep -q "Found file: dummy_test_script_13.log"; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Script output correct."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Script output incorrect."; fi; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Script not executable."; fi; fi
-rm -f /etc/dummy_test_script_13.log
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
 echo -e "\n" | tee -a ${REPORT_FILE}
