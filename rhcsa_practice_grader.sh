@@ -309,8 +309,7 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 3: grep and regex
 CURRENT_TASK=3; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: grep and regex${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-rm -f /tmp/root_lines.txt /tmp/https_service.txt &>/dev/null
-check_file_exists "/tmp/root_lines.txt"; if [[ $? -eq 0 ]]; then check_file_content "/tmp/root_lines.txt" "^root:" "-F"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 7)); fi; fi
+check_file_exists "/tmp/root_lines.txt"; if [[ $? -eq 0 ]]; then check_file_content "/tmp/root_lines.txt" "^root:"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 7)); fi; fi
 check_file_exists "/tmp/https_service.txt"; if [[ $? -eq 0 ]]; then check_file_content "/tmp/https_service.txt" "https\s*443/tcp" "-i"; if [[ $? -eq 0 ]]; then if ! grep -qs '^\s*#' /tmp/https_service.txt; then TASK_POINTS=$((TASK_POINTS + 8)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t https_service.txt correct and no comments."; else TASK_POINTS=$((TASK_POINTS + 4)); echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t https_service.txt has comments."; fi; fi; fi
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
