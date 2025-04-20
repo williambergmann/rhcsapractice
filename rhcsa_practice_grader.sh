@@ -299,7 +299,6 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 2: Redirection
 CURRENT_TASK=2; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Redirection${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-rm -f /tmp/python_files.log /tmp/python_errors.log &>/dev/null
 check_file_exists "/tmp/python_files.log"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 5)); fi
 check_file_exists "/tmp/python_errors.log"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 5)); fi
 check_file_content "/tmp/python_files.log" "/" ""; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 5)); fi
