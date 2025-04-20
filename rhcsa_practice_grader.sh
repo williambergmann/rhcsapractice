@@ -340,7 +340,7 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 CURRENT_TASK=7; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Create/Edit Files${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
 check_file_exists "/opt/myapp.conf"; if [[ $? -eq 0 ]] && [[ $(stat -c %s /opt/myapp.conf) -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 7)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /opt/myapp.conf exists and is empty."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /opt/myapp.conf missing or not empty."; fi
-check_file_exists "/opt/readme.txt"; if [[ $? -eq 0 ]]; then check_file_content "/opt/readme.txt" "^Application Readme File$" "-Fx"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 8)); fi; fi
+check_file_exists "/opt/readme.txt"; if [[ $? -eq 0 ]]; then check_file_content "/opt/readme.txt" "Application Readme File"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 8)); fi; fi
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
 echo -e "\n" | tee -a ${REPORT_FILE}
