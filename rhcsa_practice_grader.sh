@@ -368,7 +368,6 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 10: Permissions and Ownership
 CURRENT_TASK=10; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Permissions and Ownership${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-rm -f /opt/executable.sh &>/dev/null; touch /opt/executable.sh
 check_file_exists "/opt/executable.sh"; if [[ $? -eq 0 ]]; then if [[ $(stat -c %a /opt/executable.sh) == "750" ]]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Perms 750 ok."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Perms not 750."; fi; if [[ $(stat -c %U /opt/executable.sh) == "root" ]]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Owner root ok."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Owner not root."; fi; if [[ $(stat -c %G /opt/executable.sh) == "wheel" ]]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Group wheel ok."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Group not wheel."; fi; fi
 rm -f /opt/executable.sh &>/dev/null
 T_SCORE=$TASK_POINTS
