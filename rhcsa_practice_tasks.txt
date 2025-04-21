@@ -127,11 +127,11 @@ Test the mount configuration.
 Ensure the swap space is activated immediately and configured to be mounted automatically on boot using its UUID.
 
 Section 5: Create and configure file systems
-32. Format the partition `/dev/nvme0n1p4` (assume exists) with the `ext4` filesystem, giving it the label `EXT4-DATA`.
-Format the partition `/dev/nvme0n1p5` (assume exists) with the `vfat` filesystem, giving it the label `VFAT-SHARE`.
+32. Format the partition `/dev/nvme0n1p7` (assume exists) with the `ext4` filesystem, giving it the label `EXT4-DATA`.
+Format the partition `/dev/nvme0n1p8` (assume exists) with the `vfat` filesystem, giving it the label `VFAT-SHARE`.
 Create mount points `/mnt/ext4data` and `/mnt/vfatshare`.
-Mount `/dev/nvme0n1p4` on `/mnt/ext4data` manually.
-Mount `/dev/nvme0n1p5` on `/mnt/vfatshare` manually.
+Mount `/dev/nvme0n1p7` on `/mnt/ext4data` manually.
+Mount `/dev/nvme0n1p8` on `/mnt/vfatshare` manually.
 Unmount both filesystems.
 
 33. Mount the NFS share `nfssrv.example.com:/exports/readonly` onto the local directory `/mnt/nfs_ro` ensuring it is mounted read-only.
