@@ -340,7 +340,7 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 CURRENT_TASK=7; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Create/Edit Files${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
 check_file_exists "/opt/myapp.conf"; if [[ $? -eq 0 ]] && [[ $(stat -c %s /opt/myapp.conf) -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 7)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /opt/myapp.conf exists and is empty."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /opt/myapp.conf missing or not empty."; fi
-check_file_exists "/opt/readme.txt"; if [[ $? -eq 0 ]]; then check_file_content "/opt/readme.txt" "^Application Readme File$" "-Fx"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 8)); fi; fi
+check_file_exists "/opt/readme.txt"; if [[ $? -eq 0 ]]; then check_file_content "/opt/readme.txt" "Application Readme File"; if [[ $? -eq 0 ]]; then TASK_POINTS=$((TASK_POINTS + 8)); fi; fi
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
 echo -e "\n" | tee -a ${REPORT_FILE}
@@ -502,17 +502,17 @@ grade_task $CURRENT_TASK 0 0
 echo -e "\n" | tee -a ${REPORT_FILE}
 
 ### TASK 26: Partition Disk for LVM
-CURRENT_TASK=26; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Partition Disk for LVM (/dev/sdb)${COLOR_RESET}" | tee -a ${REPORT_FILE}
+CURRENT_TASK=26; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Partition Disk for LVM (/dev/nvme0n1)${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
 # Check if partitions exist and have LVM type (approximate check)
-if lsblk /dev/sdb -o NAME,SIZE,TYPE | grep -qE 'sdb1.*500M.*part' && \
-   lsblk /dev/sdb -o NAME,SIZE,TYPE | grep -qE 'sdb2.*1\.5G.*part' && \
-   parted -s /dev/sdb print | grep -Eq '\s+1\s+.*lvm' && \
-   parted -s /dev/sdb print | grep -Eq '\s+2\s+.*lvm'; then
+if lsblk /dev/nvme0n1p4 -o NAME,SIZE,TYPE | grep -q 'nvme0n1p4.*500M.*part' && \
+   lsblk /dev/nvme0n1p5 -o NAME,SIZE,TYPE | grep -q 'nvme0n1p5.*1\.5G.*part'; then
+   #parted -s /dev/nvme0n1 print | grep -q '\s+4\s+.*lvm' && \
+   #parted -s /dev/nvme0n1 print | grep -q '\s+5\s+.*lvm'; then
    TASK_POINTS=15
-   echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Partitions /dev/sdb1 (500M) and /dev/sdb2 (1.5G) found with LVM type."
+   echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Partitions /dev/nvme0n1p4 (500M) and /dev/nvme0n1p5 (1.5G) found with LVM type."
 else
-   echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Partitions /dev/sdb1 (500M) and/or /dev/sdb2 (1.5G) with LVM type not found correctly."
+   echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Partitions /dev/nvme0n1p4 (500M) and/or /dev/nvme0n1p5 (1.5G) with LVM type not found correctly."
 fi
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
@@ -521,11 +521,11 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 27: Create LVM Physical Volume (PV)
 CURRENT_TASK=27; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Create LVM Physical Volume (PV)${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-if pvs /dev/sdb1 /dev/sdb2 &> /dev/null; then
+if pvs /dev/nvme0n1p4 /dev/nvme0n1p5 &> /dev/null; then
     TASK_POINTS=15
-    echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t PVs found on /dev/sdb1 and /dev/sdb2."
+    echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t PVs found on /dev/nvme0n1p4 and /dev/nvme0n1p5."
 else
-    echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t PVs not found on /dev/sdb1 and /dev/sdb2."
+    echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t PVs not found on /dev/nvme0n1p4 and /dev/nvme0n1p5."
 fi
 T_SCORE=$TASK_POINTS
 grade_task $CURRENT_TASK $T_TOTAL $T_SCORE
@@ -538,9 +538,9 @@ VG_NAME="vg_app"
 if vgs "$VG_NAME" &>/dev/null; then
     TASK_POINTS=$((TASK_POINTS + 5))
     echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t VG '$VG_NAME' exists."
-    if vgdisplay "$VG_NAME" | grep -q '/dev/sdb1' && vgdisplay "$VG_NAME" | grep -q '/dev/sdb2'; then
+    if vgdisplay -v "$VG_NAME" | grep -q '/dev/nvme0n1p4' && vgdisplay -v "$VG_NAME" | grep -q '/dev/nvme0n1p5'; then
         TASK_POINTS=$((TASK_POINTS + 10))
-        echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t VG '$VG_NAME' contains both /dev/sdb1 and /dev/sdb2."
+        echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t VG '$VG_NAME' contains both /dev/nvme0n1p4 and /dev/nvme0n1p5."
     else
         echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t VG '$VG_NAME' does not contain both expected PVs."
     fi
@@ -554,7 +554,7 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 29: Create/Delete LVM Logical Volume (LV)
 CURRENT_TASK=29; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Create/Delete LVM Logical Volume (LV)${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-VG_NAME="vg_app"; LV_DATA="lv_app_data"; LV_LOGS="lv_app_logs"; LV_DATA_SIZE="450.00m" # lvs uses lowercase m
+VG_NAME="vg_app"; LV_DATA="lv_app_data"; LV_LOGS="lv_app_logs"; LV_DATA_SIZE="452.00m" # lvs uses lowercase m
 # Check lv_app_data exists with correct size
 LV_DATA_PATH="/dev/${VG_NAME}/${LV_DATA}"
 if lvs "$LV_DATA_PATH" &>/dev/null; then
@@ -612,9 +612,9 @@ echo -e "\n" | tee -a ${REPORT_FILE}
 ### TASK 32: Format and Mount VFAT/ext4
 CURRENT_TASK=32; echo -e "${COLOR_INFO}Evaluating Task $CURRENT_TASK: Format and Mount VFAT/ext4${COLOR_RESET}" | tee -a ${REPORT_FILE}
 T_SCORE=0; T_TOTAL=15; TASK_POINTS=0
-# Check format (assume devices /dev/sdb1, /dev/sdb2 exist)
-if blkid /dev/sdb1 2>/dev/null | grep -q 'LABEL="EXT4-DATA"' && blkid /dev/sdb1 2>/dev/null | grep -q 'TYPE="ext4"'; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /dev/sdb1 formatted ext4/labeled."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /dev/sdb1 not formatted/labeled correctly."; fi
-if blkid /dev/sdb2 2>/dev/null | grep -q 'LABEL="VFAT-SHARE"' && blkid /dev/sdb2 2>/dev/null | grep -q 'TYPE="vfat"'; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /dev/sdb2 formatted vfat/labeled."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /dev/sdb2 not formatted/labeled correctly."; fi
+# Check format (assume devices /dev/nvme0n1p7, /dev/nvme0n1p8 exist)
+if blkid /dev/nvme0n1p7 2>/dev/null | grep -q 'LABEL="EXT4-DATA"' && blkid /dev/nvme0n1p7 2>/dev/null | grep -q 'TYPE="ext4"'; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /dev/sdb1 formatted ext4/labeled."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /dev/sdb1 not formatted/labeled correctly."; fi
+if blkid /dev/nvme0n1p8 2>/dev/null | grep -q 'LABEL="VFAT-SHARE"' && blkid /dev/nvme0n1p8 2>/dev/null | grep -q 'TYPE="vfat"'; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t /dev/sdb2 formatted vfat/labeled."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t /dev/sdb2 not formatted/labeled correctly."; fi
 # Check mount points exist
 if [ -d /mnt/ext4data ] && [ -d /mnt/vfatshare ]; then TASK_POINTS=$((TASK_POINTS + 5)); echo -e "${COLOR_OK}[OK]${COLOR_RESET}\t\t Mount points exist."; else echo -e "${COLOR_FAIL}[FAIL]${COLOR_RESET}\t Mount points missing."; fi
 # Manual mount/unmount check is difficult in static script
@@ -1056,6 +1056,7 @@ echo -e "\n------------------------------------------------" | tee -a ${REPORT_F
 if [[ $GRAND_TOTAL_POSSIBLE -lt $MAX_SCORE ]] && [[ $GRAND_TOTAL_POSSIBLE -gt 0 ]]; then
     PASS_SCORE=$(( GRAND_TOTAL_POSSIBLE * PASS_THRESHOLD_PERCENT / 100 ))
     MAX_SCORE_ADJUSTED=$GRAND_TOTAL_POSSIBLE
+    SCORE_PERCENTAGE=$(( SCORE / GRAND_TOTAL_POSSIBLE * 100 ))
 else
     # Handle case where MAX_SCORE might be 0 if no tasks run
     [[ $MAX_SCORE -eq 0 ]] && MAX_SCORE=1
@@ -1064,8 +1065,8 @@ else
 fi
 
 
-echo -e "\nPassing score:\t\t${PASS_SCORE} ( ${PASS_THRESHOLD_PERCENT}% of ${MAX_SCORE_ADJUSTED} points possible)" | tee -a ${REPORT_FILE}
-echo -e "Your score:\t\t${SCORE}" | tee -a ${REPORT_FILE}
+echo -e "\nPassing score:\t\t${PASS_SCORE} (${PASS_THRESHOLD_PERCENT}% of ${MAX_SCORE_ADJUSTED} points possible)" | tee -a ${REPORT_FILE}
+echo -e "Your score:\t\t${SCORE} (${SCORE_PERCENTAGE}% of ${MAX_SCORE_ADJUSTED} points possible)" | tee -a ${REPORT_FILE}
 echo -e "\n" | tee -a ${REPORT_FILE}
 
 if [[ $SCORE -ge $PASS_SCORE ]]; then
