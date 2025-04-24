@@ -1,6 +1,6 @@
 #!/bin/bash
 # Grader script - Comprehensive RHCSA Practice Set (67 Tasks) - CORRECTED
-# Version: 2025-04-17
+# Version: 2025-04-23
 
 # --- Practice Tasks (Reference - Tasks 1-67 from user) ---
 # Section 1: Understand and use essential tools
